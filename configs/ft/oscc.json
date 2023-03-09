@@ -1,0 +1,76 @@
+{
+    "name": "OSSC",
+    "n_gpu": 1,
+    "arch": {
+        "type": "FrozenInTime",
+        "args": {
+            "video_params": {
+                "model": "SpaceTimeTransformer",
+                "arch_config": "base_patch16_224",
+                "num_frames": 16,
+                "pretrained": true,
+                "time_init": "zeros"
+            },
+            "text_params": {
+                "model": "distilbert-base-uncased",
+                "pretrained": true,
+                "input": "text"
+            },
+            "projection": "minimal",
+            "projection_dim": 2,
+            "load_checkpoint": "/mnt/hdd1/ego4d_proj/tianran_ego4d/EgoVLP/pretrained/egovlp.pth"
+        }
+    },
+    "data_loader":
+                {
+                    "type": "MultiDistTextVideoDataLoader",
+                    "args":{
+                        "dataset_name": "Ego4D_OSCC",
+                        "data_dir":  "/mnt/hdd1/ego4d_proj/ego4d_data/v1/clips",
+                        "meta_dir": "/mnt/hdd1/ego4d_proj/ego4d_data/v1/annotations",
+                        "shuffle": true,                                         
+                        "num_workers": 0,
+                        "batch_size": 4,
+                        "split": "train",
+                        "subsample": 1,
+                        "text_params": {
+                            "input": "text"
+                        },
+                        "video_params": {
+                            "input_res": 224,
+                            "num_frames": 16,
+                            "loading": "lax"
+                        },
+                        "reader": "cv2"
+                    }
+                },
+    "optimizer": {
+        "type": "AdamW",
+        "args":{
+            "lr": 3e-5
+        }
+    },
+    "loss": {
+        "type": "CrossEntropy",
+        "args": {
+        }
+    },
+    "metrics": [
+        "oscc_metrics"
+     ],
+    "trainer": {
+        "epochs": 100,
+        "max_samples_per_epoch": 500000,
+        "save_dir": "/mnt/hdd1/ego4d_proj/mingxiaohuo_ego4d/EgoVLP/results/OSSC",
+        "save_period": 2,
+        "verbosity": 2,
+        "monitor": "min val_loss_0",
+        "early_stop": 10,
+        "init_val": false,
+        "neptune": false
+    },
+    "visualizer": {
+        "type": ""
+    }
+
+}
